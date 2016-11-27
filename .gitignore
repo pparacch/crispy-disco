@@ -4,3 +4,5 @@
 .Ruserdata
 
 *.html
+
+exploration/pier/exploration_and_data_analysis_cache/*
