@@ -2,7 +2,7 @@
 Team: <TBD>
 
 Team Members:
-David Langer, Pedro Pereira, Pier Lorenzo Paracchini, ...
+David Langer, Pedro Pereira, Pier Lorenzo Paracchini
 
 #Recommender Systems
 
