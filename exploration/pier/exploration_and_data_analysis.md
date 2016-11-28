@@ -460,3 +460,154 @@ From the data below we can see that there are 49 clients where it is posible to 
 |16203    |  NA|  NA|  NaN|   4|
 
 
+
+
+```r
+df_train[df_train$ncodpers == 183439, c(1:30), with = F]
+##    fecha_dato ncodpers ind_empleado pais_residencia sexo age fecha_alta
+## 1: 2015-01-28   183439                                    NA       <NA>
+## 2: 2015-02-28   183439                                    NA       <NA>
+## 3: 2015-03-28   183439                                    NA       <NA>
+## 4: 2015-04-28   183439                                    NA       <NA>
+## 5: 2016-01-28   183439            N              ES    H  74 2000-07-18
+## 6: 2016-02-28   183439            N              ES    H  74 2000-07-18
+## 7: 2016-03-28   183439            N              ES    H  74 2000-07-18
+## 8: 2016-04-28   183439            N              ES    H  74 2000-07-18
+##    ind_nuevo antiguedad indrel ult_fec_cli_1t indrel_1mes tiprel_1mes
+## 1:        NA         NA     NA           <NA>                        
+## 2:        NA         NA     NA           <NA>                        
+## 3:        NA         NA     NA           <NA>                        
+## 4:        NA         NA     NA           <NA>                        
+## 5:         1          4      1           <NA>         1.0           A
+## 6:         1          5      1           <NA>         1.0           A
+## 7:         0          6      1           <NA>         1.0           A
+## 8:         0          7      1           <NA>         1.0           I
+##    indresi indext conyuemp canal_entrada indfall tipodom cod_prov nomprov
+## 1:                                                    NA       NA        
+## 2:                                                    NA       NA        
+## 3:                                                    NA       NA        
+## 4:                                                    NA       NA        
+## 5:       S      N                    KHM       N       1       28  MADRID
+## 6:       S      N                    KHM       N       1       28  MADRID
+## 7:       S      N                    KHM       N       1       28  MADRID
+## 8:       S      N                    KHM       N       1       28  MADRID
+##    ind_actividad_cliente    renta          segmento ind_ahor_fin_ult1
+## 1:                    NA       NA                                   0
+## 2:                    NA       NA                                   0
+## 3:                    NA       NA                                   0
+## 4:                    NA       NA                                   0
+## 5:                     0 134512.8          01 - TOP                 0
+## 6:                     0 134512.8          01 - TOP                 0
+## 7:                     0 134512.8          01 - TOP                 0
+## 8:                     0 134512.8 02 - PARTICULARES                 0
+##    ind_aval_fin_ult1 ind_cco_fin_ult1 ind_cder_fin_ult1 ind_cno_fin_ult1
+## 1:                 0                0                 0                0
+## 2:                 0                0                 0                0
+## 3:                 0                0                 0                0
+## 4:                 0                0                 0                0
+## 5:                 0                0                 0                0
+## 6:                 0                0                 0                0
+## 7:                 0                0                 0                0
+## 8:                 0                0                 0                0
+##    ind_ctju_fin_ult1
+## 1:                 0
+## 2:                 0
+## 3:                 0
+## 4:                 0
+## 5:                 0
+## 6:                 0
+## 7:                 0
+## 8:                 0
+```
+
+
+```r
+df_train[df_train$ncodpers == 15917, c(1:30), with = F]
+##    fecha_dato ncodpers ind_empleado pais_residencia sexo age fecha_alta
+## 1: 2015-01-28    15917            F              ES    H  49 1995-01-16
+## 2: 2015-02-28    15917            F              ES    H  49 1995-01-16
+## 3: 2015-03-28    15917            F              ES    H  49 1995-01-16
+## 4: 2015-04-28    15917            F              ES    H  49 1995-01-16
+## 5: 2016-01-28    15917            F              ES    H  50 1995-01-16
+## 6: 2016-02-28    15917            F              ES    H  50 1995-01-16
+## 7: 2016-03-28    15917            F              ES    H  50 1995-01-16
+## 8: 2016-04-28    15917            F              ES    H  50 1995-01-16
+##    ind_nuevo antiguedad indrel ult_fec_cli_1t indrel_1mes tiprel_1mes
+## 1:         0        246      1           <NA>           1           A
+## 2:         0        246      1           <NA>           1           A
+## 3:         0        246      1           <NA>           1           A
+## 4:         0        246      1           <NA>           1           A
+## 5:         0        252      1           <NA>           1           A
+## 6:         0        253      1           <NA>           1           A
+## 7:         0        254      1           <NA>           1           A
+## 8:         0        255      1           <NA>           1           A
+##    indresi indext conyuemp canal_entrada indfall tipodom cod_prov nomprov
+## 1:       S      N        N           KAT       N       1       48 BIZKAIA
+## 2:       S      N        N           KAT       N       1       48 BIZKAIA
+## 3:       S      N        N           KAT       N       1       48 BIZKAIA
+## 4:       S      N        N           KAT       N       1       48 BIZKAIA
+## 5:       S      N        N           KAT       N       1       48 BIZKAIA
+## 6:       S      N        N           KAT       N       1       48 BIZKAIA
+## 7:       S      N        N           KAT       N       1       48 BIZKAIA
+## 8:       S      N        N           KAT       N       1       48 BIZKAIA
+##    ind_actividad_cliente renta          segmento ind_ahor_fin_ult1
+## 1:                     1    NA 02 - PARTICULARES                 0
+## 2:                     1    NA 02 - PARTICULARES                 0
+## 3:                     1    NA 02 - PARTICULARES                 0
+## 4:                     1    NA 02 - PARTICULARES                 0
+## 5:                     1    NA 02 - PARTICULARES                 0
+## 6:                     1    NA 02 - PARTICULARES                 0
+## 7:                     1    NA 02 - PARTICULARES                 0
+## 8:                     1    NA 02 - PARTICULARES                 0
+##    ind_aval_fin_ult1 ind_cco_fin_ult1 ind_cder_fin_ult1 ind_cno_fin_ult1
+## 1:                 0                1                 0                0
+## 2:                 0                1                 0                0
+## 3:                 0                1                 0                0
+## 4:                 0                1                 0                0
+## 5:                 0                1                 0                0
+## 6:                 0                1                 0                0
+## 7:                 0                1                 0                0
+## 8:                 0                1                 0                0
+##    ind_ctju_fin_ult1
+## 1:                 0
+## 2:                 0
+## 3:                 0
+## 4:                 0
+## 5:                 0
+## 6:                 0
+## 7:                 0
+## 8:                 0
+df_train[df_train$ncodpers == 16203, c(1:30), with = F]
+##    fecha_dato ncodpers ind_empleado pais_residencia sexo age fecha_alta
+## 1: 2016-01-28    16203            N              ES    V  70 2015-12-23
+## 2: 2016-02-28    16203            N              ES    V  70 2015-12-23
+## 3: 2016-03-28    16203            N              ES    V  70 2015-12-23
+## 4: 2016-04-28    16203            N              ES    V  70 2015-12-23
+##    ind_nuevo antiguedad indrel ult_fec_cli_1t indrel_1mes tiprel_1mes
+## 1:         0        250      1           <NA>           1           A
+## 2:         0        252      1           <NA>           1           I
+## 3:         0        253      1           <NA>           1           A
+## 4:         0        253      1           <NA>           1           A
+##    indresi indext conyuemp canal_entrada indfall tipodom cod_prov
+## 1:       S      N                    KAT       N       1        8
+## 2:       S      N                    KAT       N       1        8
+## 3:       S      N                    KAT       N       1        8
+## 4:       S      N                    KAT       N       1        8
+##      nomprov ind_actividad_cliente renta          segmento
+## 1: BARCELONA                     1    NA 02 - PARTICULARES
+## 2: BARCELONA                     1    NA          01 - TOP
+## 3: BARCELONA                     1    NA          01 - TOP
+## 4: BARCELONA                     1    NA          01 - TOP
+##    ind_ahor_fin_ult1 ind_aval_fin_ult1 ind_cco_fin_ult1 ind_cder_fin_ult1
+## 1:                 0                 0                1                 0
+## 2:                 0                 0                1                 0
+## 3:                 0                 0                1                 0
+## 4:                 0                 0                1                 0
+##    ind_cno_fin_ult1 ind_ctju_fin_ult1
+## 1:                0                 0
+## 2:                0                 0
+## 3:                0                 0
+## 4:                0                 0
+```
+
+

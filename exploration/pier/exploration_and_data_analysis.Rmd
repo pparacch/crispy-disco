@@ -193,3 +193,14 @@ From the data below we can see that there are `r dim(renta_an_1)[1]` clients whe
 
 `r kable(renta_an_1, format = "markdown",caption = "Summary OF CLIENTS WITH Missing renta for some entries")`
 `r kable(head(renta_an_2, 20), format = "markdown",caption = "Summary OF CLIENTS (first 20s) WITH Missing renta all entries")`
+
+```{r exampleOfMissingRentaWIthSomeValues}
+df_train[df_train$ncodpers == 183439, c(1:30), with = F]
+```
+
+```{r exampleOfMissingRentaWithAllMissing}
+df_train[df_train$ncodpers == 15917, c(1:30), with = F]
+df_train[df_train$ncodpers == 16203, c(1:30), with = F]
+```
+
+
