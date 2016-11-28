@@ -16,6 +16,7 @@ Using the `tidyverse` package for performing exploration and data analysis.
 ```{r requiredLibraries}
 require(data.table)
 require(lubridate)
+require(dplyr)
 require(knitr)
 input_file <- "./../../data/raw/train_ver2.csv"
 
@@ -166,7 +167,29 @@ colnames(tbl_missing_nas) <- "NAs"
 
 tbl_empty <- sort(sapply(as.list(df_train), FUN = noOfEmptyValues), decreasing = T)
 tbl_empty <- as.matrix(tbl_empty[tbl_empty > 0])
-colnames(tbl_empty) <- "NAs"
+colnames(tbl_empty) <- "EMPTYs"
 ```
 `r kable(as.matrix(tbl_missing_nas, ncol = 1), caption = "Summary OF MISSING VALUES (>0) BY FEATURE (ALL FEATURES)")`
 `r kable(as.matrix(tbl_empty, ncol = 1), caption = "Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)")`
+
+__ult_fec_cli_1t__, last date as primary customer (if he isn't at the end of the month)
+
+__renta__, Gross income of the household
+
+```{r rentaAnalysis}
+tmp <- select(df_train, fecha_dato, ncodpers, renta)
+renta_an <- group_by(tmp, ncodpers) %>% 
+    summarise(min = min(renta, na.rm = T), max = max(renta, na.rm = T), mean = mean(renta, na.rm = T), nas = sum(is.na(renta)))
+
+idx_renta_rentaAvailableSomeNAs <- renta_an$nas > 0 & (!is.na(renta_an$min) | !is.na(renta_an$max) | !is.na(renta_an$mean))
+idx_renta_rentaAvailableAllNAs <- renta_an$nas > 0 & (is.na(renta_an$min) & is.na(renta_an$max) & is.na(renta_an$mean))
+
+renta_an_1 <- renta_an[idx_renta_rentaAvailableSomeNAs,]
+renta_an_2 <- renta_an[idx_renta_rentaAvailableAllNAs,]
+renta_an_1$sameValues <- (renta_an_1$min == renta_an_1$max) & (renta_an_1$mean == renta_an_1$max)
+```
+
+From the data below we can see that there are `r dim(renta_an_1)[1]` clients where it is posible to recove the missing renta just just using the available renta for the same client not NA. On teh other side there are `r dim(renta_an_2)[1]` clients where such information cannot be found.
+
+`r kable(renta_an_1, caption = "Summary OF CLIENTS WITH Missing renta for some entries")`
+`r kable(head(renta_an_2, 20), caption = "Summary OF CLIENTS (first 20s) WITH Missing renta all entries")`

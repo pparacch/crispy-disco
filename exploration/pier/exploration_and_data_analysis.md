@@ -10,6 +10,7 @@ Using the `tidyverse` package for performing exploration and data analysis.
 ```r
 require(data.table)
 require(lubridate)
+require(dplyr)
 require(knitr)
 input_file <- "./../../data/raw/train_ver2.csv"
 
@@ -319,7 +320,7 @@ colnames(tbl_missing_nas) <- "NAs"
 
 tbl_empty <- sort(sapply(as.list(df_train), FUN = noOfEmptyValues), decreasing = T)
 tbl_empty <- as.matrix(tbl_empty[tbl_empty > 0])
-colnames(tbl_empty) <- "NAs"
+colnames(tbl_empty) <- "EMPTYs"
 ```
 
 
@@ -345,7 +346,7 @@ ind_nom_pens_ult1          11432
 
 Table: Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)
 
-                       NAs
+                    EMPTYs
 ----------------  --------
 conyuemp           6202133
 segmento             55827
@@ -359,5 +360,111 @@ pais_residencia      22276
 indresi              22276
 indext               22276
 indfall              22276
+
+
+
+__ult_fec_cli_1t__, last date as primary customer (if he isn't at the end of the month)
+
+__renta__, Gross income of the household
+
+
+```r
+tmp <- select(df_train, fecha_dato, ncodpers, renta)
+renta_an <- group_by(tmp, ncodpers) %>% 
+    summarise(min = min(renta, na.rm = T), max = max(renta, na.rm = T), mean = mean(renta, na.rm = T), nas = sum(is.na(renta)))
+
+idx_renta_rentaAvailableSomeNAs <- renta_an$nas > 0 & (!is.na(renta_an$min) | !is.na(renta_an$max) | !is.na(renta_an$mean))
+idx_renta_rentaAvailableAllNAs <- renta_an$nas > 0 & (is.na(renta_an$min) & is.na(renta_an$max) & is.na(renta_an$mean))
+
+renta_an_1 <- renta_an[idx_renta_rentaAvailableSomeNAs,]
+renta_an_2 <- renta_an[idx_renta_rentaAvailableAllNAs,]
+renta_an_1$sameValues <- (renta_an_1$min == renta_an_1$max) & (renta_an_1$mean == renta_an_1$max)
+```
+
+From the data below we can see that there are 49 clients where it is posible to recove the missing renta just just using the available renta for the same client not NA. On teh other side there are 237690 clients where such information cannot be found.
+
+
+
+Table: Summary OF CLIENTS WITH Missing renta for some entries
+
+ncodpers          min         max        mean   nas  sameValues 
+---------  ----------  ----------  ----------  ----  -----------
+183439      134512.83   134512.83   134512.83     4  TRUE       
+227035      691513.77   691513.77   691513.77     2  TRUE       
+237553      367279.05   367279.05   367279.05     2  TRUE       
+258075      161469.84   161469.84   161469.84     3  TRUE       
+314773       93224.55    93224.55    93224.55     4  TRUE       
+329698       80374.74    80374.74    80374.74     4  TRUE       
+407854       49531.41    49531.41    49531.41     4  TRUE       
+508391      111592.62   111592.62   111592.62     3  TRUE       
+511523       48663.81    48663.81    48663.81     3  TRUE       
+525527      216098.07   216098.07   216098.07     4  TRUE       
+541633      154167.24   154167.24   154167.24     4  TRUE       
+553523      169494.24   169494.24   169494.24     4  TRUE       
+602125      301414.59   301414.59   301414.59     1  TRUE       
+624973       71828.64    71828.64    71828.64     4  TRUE       
+626915       65924.67    65924.67    65924.67     4  TRUE       
+650529       82098.03    82098.03    82098.03     4  TRUE       
+670125      189111.51   189111.51   189111.51     3  TRUE       
+704123      303118.53   303118.53   303118.53     4  TRUE       
+708861      103593.63   103593.63   103593.63     4  TRUE       
+730041       48126.69    48126.69    48126.69     4  TRUE       
+761015       75830.67    75830.67    75830.67     2  TRUE       
+767789      138182.34   138182.34   138182.34     3  TRUE       
+872308       87466.62    87466.62    87466.62     4  TRUE       
+958957       78080.79    78080.79    78080.79     1  TRUE       
+1023366      65037.84    65037.84    65037.84     3  TRUE       
+1058086      94322.67    94322.67    94322.67     4  TRUE       
+1135973     105021.39   105021.39   105021.39     2  TRUE       
+1138614     556310.67   556310.67   556310.67     3  TRUE       
+1224617      88265.25    88265.25    88265.25     1  TRUE       
+1237901     112292.43   112292.43   112292.43     1  TRUE       
+1238073     181864.83   181864.83   181864.83     2  TRUE       
+1239302     277918.20   277918.20   277918.20     3  TRUE       
+1246401     149977.17   149977.17   149977.17     2  TRUE       
+1249566      84892.53    84892.53    84892.53     1  TRUE       
+1249946      90196.29    90196.29    90196.29     4  TRUE       
+1253914     156985.65   156985.65   156985.65     1  TRUE       
+1265115     148928.13   148928.13   148928.13     1  TRUE       
+1266330      65572.47    65572.47    65572.47     4  TRUE       
+1319315     149537.88   149537.88   149537.88     4  TRUE       
+1327313     128379.21   128379.21   128379.21     4  TRUE       
+1363763     106737.54   106737.54   106737.54     3  TRUE       
+1369095      61756.56    61756.56    61756.56     4  TRUE       
+1376219     114618.48   114618.48   114618.48     4  TRUE       
+1376650      39661.68    39661.68    39661.68     4  TRUE       
+1376785     117029.82   117029.82   117029.82     3  TRUE       
+1377797     103033.68   103033.68   103033.68     3  TRUE       
+1383721     122384.40   122384.40   122384.40     2  TRUE       
+1385426     317745.42   317745.42   317745.42     2  TRUE       
+1394072      85008.78    85008.78    85008.78     1  TRUE       
+
+
+
+
+Table: Summary OF CLIENTS (first 20s) WITH Missing renta all entries
+
+ncodpers    min   max   mean   nas
+---------  ----  ----  -----  ----
+15917        NA    NA    NaN     8
+15945        NA    NA    NaN     4
+15980        NA    NA    NaN     4
+15993        NA    NA    NaN     8
+15997        NA    NA    NaN     8
+16022        NA    NA    NaN     8
+16031        NA    NA    NaN     8
+16041        NA    NA    NaN     8
+16048        NA    NA    NaN     8
+16060        NA    NA    NaN     8
+16063        NA    NA    NaN     4
+16095        NA    NA    NaN     8
+16098        NA    NA    NaN     8
+16102        NA    NA    NaN     4
+16114        NA    NA    NaN     8
+16135        NA    NA    NaN     4
+16138        NA    NA    NaN     8
+16177        NA    NA    NaN     8
+16179        NA    NA    NaN     8
+16203        NA    NA    NaN     4
 
 
