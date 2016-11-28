@@ -169,8 +169,8 @@ tbl_empty <- sort(sapply(as.list(df_train), FUN = noOfEmptyValues), decreasing =
 tbl_empty <- as.matrix(tbl_empty[tbl_empty > 0])
 colnames(tbl_empty) <- "EMPTYs"
 ```
-`r kable(as.matrix(tbl_missing_nas, ncol = 1), caption = "Summary OF MISSING VALUES (>0) BY FEATURE (ALL FEATURES)")`
-`r kable(as.matrix(tbl_empty, ncol = 1), caption = "Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)")`
+`r kable(as.matrix(tbl_missing_nas, ncol = 1), format = "markdown", caption = "Summary OF MISSING VALUES (>0) BY FEATURE (ALL FEATURES)")`
+`r kable(as.matrix(tbl_empty, ncol = 1), format = "markdown",caption = "Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)")`
 
 __ult_fec_cli_1t__, last date as primary customer (if he isn't at the end of the month)
 
@@ -189,7 +189,7 @@ renta_an_2 <- renta_an[idx_renta_rentaAvailableAllNAs,]
 renta_an_1$sameValues <- (renta_an_1$min == renta_an_1$max) & (renta_an_1$mean == renta_an_1$max)
 ```
 
-From the data below we can see that there are `r dim(renta_an_1)[1]` clients where it is posible to recove the missing renta just just using the available renta for the same client not NA. On teh other side there are `r dim(renta_an_2)[1]` clients where such information cannot be found.
+From the data below we can see that there are `r dim(renta_an_1)[1]` clients where it is posible to recove the missing renta just just using the available renta for the same client not NA. On the other side there are `r dim(renta_an_2)[1]` clients where such information cannot be found.
 
-`r kable(renta_an_1, caption = "Summary OF CLIENTS WITH Missing renta for some entries")`
-`r kable(head(renta_an_2, 20), caption = "Summary OF CLIENTS (first 20s) WITH Missing renta all entries")`
+`r kable(renta_an_1, format = "markdown",caption = "Summary OF CLIENTS WITH Missing renta for some entries")`
+`r kable(head(renta_an_2, 20), format = "markdown",caption = "Summary OF CLIENTS (first 20s) WITH Missing renta all entries")`
