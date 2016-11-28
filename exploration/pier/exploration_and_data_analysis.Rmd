@@ -16,6 +16,7 @@ Using the `tidyverse` package for performing exploration and data analysis.
 ```{r requiredLibraries}
 require(data.table)
 require(lubridate)
+require(knitr)
 input_file <- "./../../data/raw/train_ver2.csv"
 
 #Splitting the training data as one file till 2016.04 (included)
@@ -140,3 +141,32 @@ str(df_train)
 summary(df_train)
 ```
 
+### Missing Values/ Empty Values Analysis
+
+Working with all of the data from beginning til April 2016 (included) and trying to answer the following question __Which feature has missing values? Or Which feature (either character or factor) has empty values?__
+
+```{r missingValues}
+noOfMissingValues <- function(x){
+    #all features
+    sum(is.na(x))
+}
+
+noOfEmptyValues <- function(x){
+    #For character vector and factors
+    if(is.character(x) | is.factor(x)){
+     sum(x == "")   
+    }else{
+        0
+    }
+}
+
+tbl_missing_nas <- sort(sapply(as.list(df_train), FUN = noOfMissingValues), decreasing = T)
+tbl_missing_nas <- as.matrix(tbl_missing_nas[tbl_missing_nas > 0])
+colnames(tbl_missing_nas) <- "NAs"
+
+tbl_empty <- sort(sapply(as.list(df_train), FUN = noOfEmptyValues), decreasing = T)
+tbl_empty <- as.matrix(tbl_empty[tbl_empty > 0])
+colnames(tbl_empty) <- "NAs"
+```
+`r kable(as.matrix(tbl_missing_nas, ncol = 1), caption = "Summary OF MISSING VALUES (>0) BY FEATURE (ALL FEATURES)")`
+`r kable(as.matrix(tbl_empty, ncol = 1), caption = "Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)")`

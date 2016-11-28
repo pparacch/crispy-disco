@@ -10,6 +10,7 @@ Using the `tidyverse` package for performing exploration and data analysis.
 ```r
 require(data.table)
 require(lubridate)
+require(knitr)
 input_file <- "./../../data/raw/train_ver2.csv"
 
 #Splitting the training data as one file till 2016.04 (included)
@@ -291,4 +292,72 @@ summary(df_train)
 ##  Max.   :1.00      Max.   :1.0000  
 ##  NA's   :11432
 ```
+
+### Missing Values/ Empty Values Analysis
+
+Working with all of the data from beginning til April 2016 (included) and trying to answer the following question __Which feature has missing values? Or Which feature (either character or factor) has empty values?__
+
+
+```r
+noOfMissingValues <- function(x){
+    #all features
+    sum(is.na(x))
+}
+
+noOfEmptyValues <- function(x){
+    #For character vector and factors
+    if(is.character(x) | is.factor(x)){
+     sum(x == "")   
+    }else{
+        0
+    }
+}
+
+tbl_missing_nas <- sort(sapply(as.list(df_train), FUN = noOfMissingValues), decreasing = T)
+tbl_missing_nas <- as.matrix(tbl_missing_nas[tbl_missing_nas > 0])
+colnames(tbl_missing_nas) <- "NAs"
+
+tbl_empty <- sort(sapply(as.list(df_train), FUN = noOfEmptyValues), decreasing = T)
+tbl_empty <- as.matrix(tbl_empty[tbl_empty > 0])
+colnames(tbl_empty) <- "NAs"
+```
+
+
+Table: Summary OF MISSING VALUES (>0) BY FEATURE (ALL FEATURES)
+
+                             NAs
+----------------------  --------
+ult_fec_cli_1t           6192983
+renta                    1317552
+cod_prov                   52928
+age                        22276
+fecha_alta                 22276
+ind_nuevo                  22276
+antiguedad                 22276
+indrel                     22276
+tipodom                    22276
+ind_actividad_cliente      22276
+ind_nomina_ult1            11432
+ind_nom_pens_ult1          11432
+
+
+
+
+Table: Summary OF EMPTY VALUES (>0) BY FEATURE (CHARACTER & FACTOR ONLY)
+
+                       NAs
+----------------  --------
+conyuemp           6202133
+segmento             55827
+canal_entrada        54569
+nomprov              52928
+indrel_1mes          42498
+tiprel_1mes          42498
+sexo                 22306
+ind_empleado         22276
+pais_residencia      22276
+indresi              22276
+indext               22276
+indfall              22276
+
 
