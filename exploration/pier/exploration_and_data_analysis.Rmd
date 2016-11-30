@@ -18,6 +18,7 @@ require(data.table)
 require(lubridate)
 require(dplyr)
 require(knitr)
+require(ggplot2)
 input_file <- "./../../data/raw/train_ver2.csv"
 
 #Splitting the training data as one file till 2016.04 (included)
@@ -139,7 +140,7 @@ load(input_train_typesSet)
 str(df_train)
 
 #summary
-summary(df_train)
+#summary(df_train)
 ```
 
 ### Missing Values/ Empty Values Analysis
@@ -189,18 +190,105 @@ renta_an_2 <- renta_an[idx_renta_rentaAvailableAllNAs,]
 renta_an_1$sameValues <- (renta_an_1$min == renta_an_1$max) & (renta_an_1$mean == renta_an_1$max)
 ```
 
-From the data below we can see that there are `r dim(renta_an_1)[1]` clients where it is posible to recove the missing renta just just using the available renta for the same client not NA. On the other side there are `r dim(renta_an_2)[1]` clients where such information cannot be found.
+From the data below we can see that there are `r dim(renta_an_1)[1]` clients (first 10s are visible) where it is posible to recove the missing renta just just using the available renta for the same client not NA. On the other side there are `r dim(renta_an_2)[1]` clients (first 10s are visible) where such information cannot be found.
 
-`r kable(renta_an_1, format = "markdown",caption = "Summary OF CLIENTS WITH Missing renta for some entries")`
-`r kable(head(renta_an_2, 20), format = "markdown",caption = "Summary OF CLIENTS (first 20s) WITH Missing renta all entries")`
+`r kable(head(renta_an_1, 10), format = "markdown",caption = "Summary OF CLIENTS (first 10s) WITH Missing renta for some entries")`
+`r kable(head(renta_an_2, 10), format = "markdown",caption = "Summary OF CLIENTS (first 10s) WITH Missing renta all entries")`
 
-```{r exampleOfMissingRentaWIthSomeValues}
+```{r exampleOfMissingRentaWIthSomeValues, eval = F}
 df_train[df_train$ncodpers == 183439, c(1:30), with = F]
 ```
 
-```{r exampleOfMissingRentaWithAllMissing}
+```{r exampleOfMissingRentaWithAllMissing, eval = F}
 df_train[df_train$ncodpers == 15917, c(1:30), with = F]
 df_train[df_train$ncodpers == 16203, c(1:30), with = F]
 ```
 
+__Initial strategy__ find out the median/ average salary by province using `nomprov` and `sex` as initial sefmenation and use such value for imputation of the entries with missing `renta`
 
+```{r salaySegmentation}
+salary_by_country <-  df_train %>% 
+    select(pais_residencia,renta) %>%
+    group_by(pais_residencia)
+
+salary_by_country_summary <- summarise(salary_by_country, 
+                            min = min(renta, na.rm = T),
+                            max = min(renta, na.rm = T),
+                            mean = mean(renta, na.rm = T),
+                            median = median(renta, na.rm = T))
+
+ggplot(salary_by_country_summary, aes(x = median)) +
+    geom_histogram()
+
+salary_by_country_sex <-  df_train %>% 
+    select(pais_residencia,sexo, renta) %>%
+    group_by(pais_residencia, sexo)
+
+salary_by_country_sex_summary <- summarise(salary_by_country_sex, 
+                            min = min(renta, na.rm = T),
+                            max = min(renta, na.rm = T),
+                            mean = mean(renta, na.rm = T),
+                            median = median(renta, na.rm = T))
+
+ggplot(salary_by_country_sex_summary, aes(x = median, color = sexo)) +
+    geom_histogram() + facet_wrap(facet = ~sexo)
+
+ggplot(salary_by_country_summary, aes(x = median)) +
+    geom_histogram()
+
+salary_by_location_sex <-  df_train %>% 
+    select(pais_residencia,nomprov,sexo, renta) %>%
+    group_by(pais_residencia,nomprov,sexo)
+
+salary_summary <- summarise(salary_by_location_sex, 
+                            min = min(renta, na.rm = T),
+                            max = min(renta, na.rm = T),
+                            mean = mean(renta, na.rm = T),
+                            median = median(renta, na.rm = T))
+
+```
+
+## Tell a story
+
+```{r theStory}
+#dataset dimension
+dim(df_train)
+
+#name of the features included in the dataset
+colnames((df_train))
+
+#no of unique customers in the dataset
+unique_c_ids <- unique(df_train$ncodpers)
+length(unique_c_ids)
+
+table(df_train$sexo)
+sum(is.na(df_train$sexo))
+sum(df_train$sexo == "")
+
+by_sex <- df_train %>%
+    select(ncodpers, sexo) %>%
+    filter(sexo != "") %>%
+    group_by(ncodpers, sexo) %>%
+    summarise(count = n())
+
+length(unique(by_sex$ncodpers)) == dim(by_sex)[1]
+
+#customers with no sex info 
+length(unique_c_ids) - dim(by_sex)[1]
+
+#Sex distribution
+ggplot(data = by_sex, mapping = aes(x = sexo, fill = sexo)) +
+    geom_bar()
+```
+
+```{r consistencyCheckSex}
+by_sex_check <- df_train %>%
+    select(ncodpers, sexo) %>%
+    filter(sexo != "") %>%
+    group_by(ncodpers) %>%
+    mutate(isH = any(sexo == "H"), isV = any(sexo == "V"))
+
+tmp <- by_sex_check[by_sex_check$isH==T & by_sex_check$isV == T,]
+```
+
+`r kable(tmp, format = "markdown",caption = "Customers with ambiguous sex")`
