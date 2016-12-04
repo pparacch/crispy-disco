@@ -56,7 +56,7 @@ avg.ochiai <- function(feature.matrix) {
 product.cols <- 25:48
 
 set.seed(12345)
-sample.may <- sample_n(train.may[, product.cols], size = 1000)
+sample.may <- sample_n(train.may[, product.cols], size = 5000)
 
 ochiai.may <- avg.ochiai(sample.may)
 ochiai.may
@@ -67,21 +67,70 @@ ochiai.may
 # Calculate Ochiai Coefficient matrix for May 2016 products for "01 - TOP" customers
 #
 
-# OK, use segmento feature and see what's going on
+# OK, use segmento feature and see what's going on 
 train.top <- train.may %>%
   filter(segmento == "01 - TOP")
 
 set.seed(54321)
-sample.top <- sample_n(train.top, size = 33)
+sample.top <- sample_n(train.top, size = 190)
 
 ochiai.top <- avg.ochiai(sample.top[, product.cols])
 ochiai.top
 
+
 #
-# Results:
+# Calculate Ochiai Coefficient matrix for May 2016 products for "02 - PARTICULARES" customers
 #
-#     The Ochiai coefficient for sample of all customers:        0.2881937
-#     The Ochiai coefficient for sample of "01 - TOP" customers: 0.4922935
+
+# OK, use segmento feature and see what's going on 
+train.particulares <- train.may %>%
+  filter(segmento == "02 - PARTICULARES")
+
+set.seed(984357)
+sample.particulares <- sample_n(train.particulares, size = 2913)
+
+ochiai.particulares <- avg.ochiai(sample.particulares[, product.cols])
+ochiai.particulares
+
+
+#
+# Calculate Ochiai Coefficient matrix for May 2016 products for "03 - UNIVERSITARIO" customers
+#
+
+# OK, use segmento feature and see what's going on 
+train.universitario <- train.may %>%
+  filter(segmento == "03 - UNIVERSITARIO")
+
+set.seed(74353)
+sample.universitario <- sample_n(train.universitario, size = 1860)
+
+ochiai.universitario <- avg.ochiai(sample.universitario[, product.cols])
+ochiai.universitario
+
+
+#
+# Calculate Ochiai Coefficient matrix for May 2016 products for "" customers
+#
+
+# OK, use segmento feature and see what's going on 
+train.blank <- train.may %>%
+  filter(segmento == "")
+
+set.seed(38566)
+sample.blank <- sample_n(train.blank, size = 38)
+
+ochiai.blank <- avg.ochiai(sample.blank[, product.cols])
+ochiai.blank
+
+
+#
+# Results for May products owned/used:
+#
+#     The Ochiai coefficient for sample of all customers:                  0.2780641
+#     The Ochiai coefficient for sample of "01 - TOP" customers:           0.5077601
+#     The Ochiai coefficient for sample of "02 - PARTICULARES" customers:  0.241388
+#     The Ochiai coefficient for sample of "03 - UNIVERSITARIO" customers: 0.3207485
+#     The Ochiai coefficient for sample of "" customers:                   0.04800853
 #
 #
 
