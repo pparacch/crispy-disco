@@ -86,10 +86,10 @@ create.recommendations <- function(customer.id, products.long) {
 #
 # NOTE - The following code takes a long time to run, load from disk!
 #
-lst_validation_may <- lapply(customer.ids, 
-                             create.recommendations, 
-                             validation.may.long)
-save(validation.may.list, file = "lst_Validation_May2016.RData")
+#lst_validation_may <- lapply(customer.ids, 
+#                             create.recommendations, 
+#                             validation.may.long)
+#save(validation.may.list, file = "lst_Validation_May2016.RData")
 
 # Load validation list
 load("lst_Validation_May2016.RData")
