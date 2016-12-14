@@ -20,18 +20,30 @@ library(recommenderlab)
 #
 # Load data
 #
-train <- read.csv("train_ver2.csv", stringsAsFactors = FALSE)
+#train <- read.csv("train_ver2.csv", stringsAsFactors = FALSE)
 
 # Use lubridate to work with date/time data
-train$fecha_dato <- date(train$fecha_dato)
+#train$fecha_dato <- date(train$fecha_dato)
 
 # Filter down training data to most recent (i.e., May 2016) for validation set
-train.may <- train %>%
-  filter(fecha_dato == "2016-05-28")
+#train.may <- train %>%
+#  filter(fecha_dato == "2016-05-28")
 
 # Filter down training data to April 2016
-train.april <- train %>%
-  filter(fecha_dato == "2016-04-28")
+#train.april <- train %>%
+#  filter(fecha_dato == "2016-04-28")
+
+
+load("df_May2016.RData")
+load("df_April2016.RData")
+
+train.may <- df_may_2016
+train.april <- df_april_2016
+
+rm(df_may_2016)
+rm(df_april_2016)
+gc()
+
 
 # Filter validation set down to customer present in April data and subset columns
 customer.ids <- sort(base::intersect(train.may$ncodpers, train.april$ncodpers))
@@ -43,18 +55,20 @@ validation.may <- train.may %>%
 
 
 # Leverage tidyr to move from wide to long data format
-validation.may.long <- gather(validation.may, product, owned, -ncodpers)
-train.april.long <- gather(train.april[, columns], product, owned, -ncodpers)
+validation.may.long <- gather(validation.may, product, owned, -ncodpers) %>%
+  arrange(ncodpers, product)
+train.april.long <- gather(train.april[, columns], product, owned, -ncodpers) %>%
+  arrange(ncodpers, product)
 
 
 # Filter out products not owned
 validation.may.long <- validation.may.long %>%
   filter(owned == 1) %>%
-  arrange(ncodpers)
+  arrange(ncodpers, product)
 
 train.april.long <- train.april.long %>%
   filter(owned == 1) %>%
-  arrange(ncodpers)
+  arrange(ncodpers, product)
 
 
 # Subset validation set to only products not owned in April
@@ -62,9 +76,9 @@ validation.may.long <- validation.may.long %>%
   anti_join(train.april.long, by = c("ncodpers", "product")) %>%
   arrange(ncodpers, product)
 
-# User left outer join to create master validation set, including those May 
+# Use left outer join to create master validation set, including those May 
 # customers that didn't add anything in the month of May
-validation.may.long <- validation.may.customers %>%
+validation.may.long <- validation.may %>%
   select(ncodpers) %>%
   left_join(validation.may.long, by = "ncodpers") %>%
   arrange(ncodpers, product)
@@ -75,9 +89,9 @@ validation.may.long <- validation.may.customers %>%
 create.recommendations <- function(customer.id, products.long) {
   product.obs <- products.long %>%
     filter(ncodpers == customer.id)
-  
+
   return(as.vector(product.obs$product))
-  
+
 }
 
 # The apk() function, as well as the Kaggle submission requires a list
@@ -86,10 +100,10 @@ create.recommendations <- function(customer.id, products.long) {
 #
 # NOTE - The following code takes a long time to run, load from disk!
 #
-#lst_validation_may <- lapply(customer.ids, 
-#                             create.recommendations, 
-#                             validation.may.long)
-#save(validation.may.list, file = "lst_Validation_May2016.RData")
+lst_validation_may <- lapply(customer.ids,
+                             create.recommendations,
+                             validation.may.long)
+save(lst_validation_may, file = "lst_Validation_May2016.RData")
 
 # Load validation list
 load("lst_Validation_May2016.RData")
@@ -118,7 +132,8 @@ matrix.april <- as(transactions.april, "binaryRatingMatrix")
 matrix.april
 
 # Set up parameters for Association Rules
-params <- list(supp = 0.01, conf = 0.7)
+params <- list(supp = 0.001, conf = 0.51, maxlen = 6)
+
 
 # Train Association Rule recommender
 recommender <- Recommender(matrix.april, method = "AR", parameter = params)
@@ -130,33 +145,32 @@ preds.april <- train.april %>%
   arrange(ncodpers) %>%
   select(binary.columns)
 
+
 # Fix up data to be R binary data type
 for(i in 1:ncol(preds.april)) {
   preds.april[, i] <- as.logical(preds.april[, i])
 }
 
+
 # Convert to arules transaction object
 transactions.preds.april <- as(preds.april, "transactions")
 transactions.preds.april
+
 
 # Convert arules transactions object to recommender lab object
 matrix.preds.april <- as(transactions.preds.april, "binaryRatingMatrix")
 matrix.preds.april
 
+
 # Make some predictions using April data for May
 preds <- predict(recommender, matrix.preds.april, 7)
 lst_preds <- as(preds, "list")
 
-# Prediction appear to have extraneous NAs, remove them
-preds.cleanup <- function(preds) {
-  if (length(preds) > 1) {
-    return(preds[!is.na(preds)])    
-  } else {
-    return(preds)
-  }
-}
-lst_preds <- lapply(lst_preds, preds.cleanup)
 
-# Evaluate with apk() function
-results <- apk(7, lst_validation_may, lst_preds)
+# Evaluate mapk score with the apk() function
+scores <- rep(0.0, length(lst_preds))
+for(i in 1:(length(lst_preds))) {
+  scores[i] <- apk(7, lst_validation_may[i], lst_preds[i])
+}
+results.mapk <- mean(scores)
 
